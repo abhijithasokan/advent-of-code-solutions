@@ -1,7 +1,6 @@
 from utils import aoc_comm
 import os
 import re
-from collections import Counter, defaultdict
 
 # --- update day/ year for each challenge
 settings = {
@@ -10,6 +9,11 @@ settings = {
     'cookie-path' : os.path.realpath('../aoc_cookie.json')
 }
 
+# -- OTHER LIBs that might help while coding the soultions
+from collections import Counter, defaultdict
+import math
+import functools
+import itertools
 
 
 

@@ -75,21 +75,35 @@ def solve_l2(input_str):
             else:
                 pos_to_valid_fields[pos] = pos_to_valid_fields[pos].intersection(valid_fields)
 
-    srt = sorted(pos_to_valid_fields.items(), key = lambda xx: len(xx[1]))
+    heap = [(len(rrs), pos) for pos, rrs in pos_to_valid_fields.items()]
+    import heapq
+    heapq.heapify(heap)
 
-    used = set()
+    rule_to_valid_pos = defaultdict(list)
+    for pos, rrs in pos_to_valid_fields.items():
+        for rr in rrs:
+            rule_to_valid_pos[rr].append(pos)
+
+    visited = set()
+    num_fields = len(yt)
     ans = 1
-    for pos, valid_rules in srt:
-        rule = None
-        for rr in valid_rules:
-            if rr not in used:
-                rule = rr
-                used.add(rr)
-                break
-        assert(rule is not  None)
+    while heap and (len(visited) != num_fields):
+        priority, pos = heapq.heappop(heap)
+        if pos in visited:
+            continue
+        assert(priority == 1)
+        v_rules = pos_to_valid_fields[pos]
+        assert(len(v_rules) == 1)
+        rule = v_rules.pop()
+        #print(pos, rule)
+        visited.add(pos)
+        for pp in rule_to_valid_pos[rule]:
+            pos_to_valid_fields[pp].discard(rule)
+            heapq.heappush(heap, ( len(pos_to_valid_fields[pp]), pp) )
+
         if "departure" in rule:
             ans *= yt[pos]
-    
+                           
     return ans
 
 

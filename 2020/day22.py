@@ -68,7 +68,7 @@ def game_l2(p1_deck, p2_deck, cache_table, is_sub_game = True):
         if decks in seen_decks:
             final_winner = 1
             cache_table[cache_table_key] = final_winner
-            return final_winner, None, None
+            return final_winner, p1_deck, p2_deck
 
         seen_decks.add(decks)
         

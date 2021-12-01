@@ -37,7 +37,7 @@ def solve_l1(input_str): # input data will be passed to this as string
 @aoc_comm(settings, level = 2)
 def solve_l2(input_str):
     inp = list(parse_input(input_str))
-    new_inp = list( sum(inp[ind:ind+3]) for ind in range(len(inp)) )
+    new_inp = list( sum(inp[ind:ind+3]) for ind in range(len(inp)-2) )
     return inc_count(new_inp)
 
 

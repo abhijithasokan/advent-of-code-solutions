@@ -145,6 +145,7 @@ def aoc_comm(settings, level):
                 return "Ans for level - %d not submitted"%(level)
             response = comm.submit_answer(settings['year'], settings['day'], level, ans)
             return "Response from AOC: %s"%response
+        new_func.raw_ = func
         return new_func
     return deco
 

@@ -1,10 +1,10 @@
-import functools
-
 from utils import aoc_comm
 import os
+
 import itertools
 import heapq
 import operator
+import functools
 
 # --- update day/ year for each challenge
 settings = {
@@ -16,9 +16,8 @@ settings = {
 
 def parse_input(inp_content):
     inp_content = inp_content.strip()
-    for ee in inp_content.split('\n'):
-        yield [int(e) for e in ee]
-
+    matrix = [list(map(int, ss)) for ss in inp_content.split('\n')]
+    return matrix, len(matrix), len(matrix[0])
 
 def get_surround_ind(ii, jj, r_sz, c_cz, incl_diagonals = True):
     shifts = itertools.product(range(-1, 2), range(-1, 2))
@@ -31,9 +30,8 @@ def get_surround_ind(ii, jj, r_sz, c_cz, incl_diagonals = True):
 
 @aoc_comm(settings, level = 1)
 def solve_l1(input_str):
-    matrix = list(parse_input(input_str))
+    matrix, r_sz, c_cz = parse_input(input_str)
     ans = 0
-    r_sz, c_cz = len(matrix), len(matrix[0])
     for ii, jj in itertools.product(range(r_sz), range(c_cz)):
         if all(matrix[ii][jj] < matrix[x][y] for x, y in get_surround_ind(ii, jj, r_sz, c_cz, True)):
             ans += matrix[ii][jj] + 1
@@ -53,8 +51,7 @@ def flood_fill(matrix, ii, jj, r_sz, c_cz):
 
 @aoc_comm(settings, level = 2)
 def solve_l2(input_str):
-    matrix = list(parse_input(input_str))
-    r_sz, c_cz = len(matrix), len(matrix[0])
+    matrix, r_sz, c_cz = parse_input(input_str)
     top_basins = []
     for ii, jj in itertools.product(range(r_sz), range(c_cz)):
         heapq.heappush(top_basins, flood_fill(matrix, ii, jj, r_sz, c_cz))

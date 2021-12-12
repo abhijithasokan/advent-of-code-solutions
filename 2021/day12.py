@@ -19,10 +19,7 @@ def parse_input(inp_content):
     return adj_list
 
 
-def dfs2(node: str, adj_list: defaultdict, visited: set):
-    if not hasattr(dfs2, 'double_node'):
-        dfs2.double_node = None
-
+def dfs2(node: str, adj_list: defaultdict, visited: set, double_node = None):
     if node == 'end':
         return 1
     if node == 'start' and node in visited:
@@ -31,19 +28,17 @@ def dfs2(node: str, adj_list: defaultdict, visited: set):
     if node.islower():
         if node not in visited:
             visited.add(node)
-        elif dfs2.double_node is None:
-            dfs2.double_node = node
+        elif double_node is None:
+            double_node = node
         else:
             return 0
 
     paths_here = 0
     for v2 in adj_list[node]:
-        paths_here += dfs2(v2, adj_list, visited)
+        paths_here += dfs2(v2, adj_list, visited, double_node)
 
     if node.islower():
-        if node == dfs2.double_node:
-            dfs2.double_node = None
-        else:
+        if node != double_node:
             visited.discard(node)
     return paths_here
 
@@ -51,16 +46,13 @@ def dfs2(node: str, adj_list: defaultdict, visited: set):
 @aoc_comm(settings, level = 1)
 def solve_l1(input_str):
     adj_list = parse_input(input_str)
-    dfs2.double_node = not None
-    ans = dfs2('start', adj_list, set())
-    dfs2.double_node = None
+    ans = dfs2('start', adj_list, set(), '')
     return ans
 
 
 @aoc_comm(settings, level = 2)
 def solve_l2(input_str):
     adj_list = parse_input(input_str)
-    dfs2.double_node = None
     ans = dfs2('start', adj_list, set())
     return ans
 

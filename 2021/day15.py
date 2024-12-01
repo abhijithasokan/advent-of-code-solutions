@@ -1,3 +1,5 @@
+import datetime
+
 from utils import aoc_comm
 import os
 from collections import defaultdict
@@ -88,10 +90,16 @@ def solve_l2(input_str):
 
 
 def main():
+    import time
+    print(datetime.datetime.now())
     l1_status = solve_l1()
+    print(datetime.datetime.now())
     print(l1_status)
 
+
+    print(datetime.datetime.now())
     l2_status = solve_l2()
+    print(datetime.datetime.now())
     print(l2_status)
 
 

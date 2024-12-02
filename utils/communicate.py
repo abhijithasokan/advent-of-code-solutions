@@ -59,6 +59,7 @@ class AOCMiscUtil:
         
 
 class AOCCommunicator:
+    INPUT_CACHE_DIR = 'inputs'
     def __init__(self, usession, uname = None):
         global TEMPLATE_HEADER
         self.headers = copy.deepcopy(TEMPLATE_HEADER)
@@ -66,6 +67,7 @@ class AOCCommunicator:
         self.network_call_count = 0
         if uname is not None:
             self.validate_session(uname.strip())
+        os.makedirs(AOCCommunicator.INPUT_CACHE_DIR, exist_ok=True)
 
     def get_user_name(self):
         global ROOT_URL
@@ -104,15 +106,15 @@ class AOCCommunicator:
         return page
 
     def get_input_file(self, year, day, force = False):
-        file_name = "input_%d_%d.txt"%(year, day)
-        if (not force) and os.path.exists(file_name):
+        file_path = os.path.join(AOCCommunicator.INPUT_CACHE_DIR, f'{year}_{day}.txt')
+        if (not force) and os.path.exists(file_path):
             print("<DBG> Input file for challenge - %d/day_%d already exists. Using the data from file"%(year, day))
             page = ''
-            with open(file_name, 'r') as inp_file:
+            with open(file_path, 'r') as inp_file:
                 page = inp_file.read()     
         else:
             page = self.get_response(AOCMiscUtil.get_input_file_url(year, day))
-            with open(file_name, 'w') as inp_file:
+            with open(file_path, 'w') as inp_file:
                 inp_file.write(page)
         return page
 
@@ -150,4 +152,5 @@ def aoc_comm(settings, level):
     return deco
 
 
-
+def run_example(solver, example):
+    return solver.raw_(example)

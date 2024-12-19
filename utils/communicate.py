@@ -138,11 +138,11 @@ def aoc_comm(settings, level):
         nonlocal settings
         session_cookie = AOCMiscUtil.get_cookie(settings['cookie-path'])
         comm = AOCCommunicator(session_cookie)
-        def new_func():
+        def new_func(*args, **kwargs):
             nonlocal comm
             nonlocal settings, level
             page = comm.get_input_file(settings['year'], settings['day'])
-            ans = func(page)
+            ans = func(page, *args, **kwargs)
             if (ans == None) or ( "y" != input("Submit answer - %s  for level %d? " %(str(ans), level) ) ):
                 return "Ans for level - %d not submitted"%(level)
             response = comm.submit_answer(settings['year'], settings['day'], level, ans)
@@ -152,5 +152,5 @@ def aoc_comm(settings, level):
     return deco
 
 
-def run_example(solver, example):
-    return solver.raw_(example)
+def run_example(solver, *args, **kwargs):
+    return solver.raw_(*args, **kwargs)

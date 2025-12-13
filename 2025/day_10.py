@@ -92,8 +92,6 @@ Prompt used:
 
 What are some possible solutions?
 """
-
-
 def solve_min_l1_integer(A, b):
     """
     Solves x^T A = b for x >= 0 (integers) minimizing sum(x).
@@ -168,67 +166,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# def solve2(dest_node, edge_ops):
-#     ns = len(dest_node)
-#     source_node = (0,) * ns
-#     qq = []
-#     heappush(qq, (0, source_node)) # cost, node
-#     visited = set()
-
-#     while qq:
-#         dist, node = heappop(qq)
-#         if node == dest_node:
-#             return dist
-#         if node in visited:
-#             continue
-
-#         visited.add(node)
-#         for edge_op in edge_ops:
-#             next_node = list(node)
-#             for ind in edge_op:
-#                 next_node[ind] += 1
-
-#             if any( next_node[i] > dest_node[i] for i in range(ns) ):
-#                 continue
-#             heappush(qq, (dist + 1, tuple(next_node)))
-
-#     raise ValueError("Node not found")
-
-
-# def solve3(dest_node, ops):
-#     build_next_node = lambda node, op: tuple( node[i] + (1 if i in op else 0) for i in range(len(node)) )
-#     is_valid_node = lambda node: all( node[i] <= dest_node[i] for i in range(len(node)) )
-
-#     cache_map = { dest_node: 0 }
-#     def func(node, ind):
-#         # print("At node:", node, " ind:", ind)
-#         cache_val = cache_map.get(node, None)
-#         if cache_val is not None:
-#             return cache_val
-
-#         if ind >= len(ops):
-#             return None
-
-#         ans = func(node, ind + 1)
-#         next_node = build_next_node(node, ops[ind])
-#         cost_here = 0
-#         while is_valid_node(next_node):
-#             res = func(next_node, ind + 1)
-#             cost_here += 1
-#             if res is None:
-#                 next_node = build_next_node(next_node, ops[ind])
-#                 continue
-
-#             ans = res + cost_here if ans is None else min(ans, res + cost_here)
-#             next_node = build_next_node(next_node, ops[ind])
-
-#         cache_map[node] = ans
-#         return ans
-
-
-#     ns = len(dest_node)
-#     source_node = (0,) * ns
-
-#     return func(source_node, 0)

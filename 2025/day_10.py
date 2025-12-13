@@ -1,6 +1,5 @@
-from functools import lru_cache
-import pulp
 import numpy as np
+from scipy.optimize import milp, LinearConstraint, Bounds
 from utils import aoc_comm, run_example
 import os
 
@@ -86,7 +85,7 @@ def solve_l1(input_str):  # input data will be passed to this as string
 """
 The below function is generated with Gemini AI assistance (only this linear solver function).
 Prompt used:
-    I have an equation of the form x^TA=b where x is vector of size k, b is vector of size d and A is a matrix of (k*d).
+    I have an equation of the form Ax=b where all x is vector of size k*1, b is vector of size d*1 and A is a matrix of d*k, all are integer values.
     Values in A, b, x are non-negative integers.
     I need to solve for x (A and b are known) that minimise L1 norm of x.
 
@@ -94,39 +93,53 @@ What are some possible solutions?
 """
 def solve_min_l1_integer(A, b):
     """
-    Solves x^T A = b for x >= 0 (integers) minimizing sum(x).
-    Args:
-        A: Matrix (k x d)
-        b: Vector (size d)
+    Solves Ax = b for a vector x of non-negative integers such that 
+    the L1 norm (sum of x) is minimized.
+
+    Parameters:
+    -----------
+    A : array-like, shape (d, k)
+        The coefficient matrix (integers).
+    b : array-like, shape (d,)
+        The target vector (integers).
+
     Returns:
-        x: Solution vector (size k) or None if infeasible
+    --------
+    x : numpy.ndarray or None
+        The optimal integer vector x of shape (k,) if a solution exists.
+        Returns None if no feasible solution is found.
     """
-    k, d = A.shape
-
-    # 1. Initialize the Model (Minimize)
-    prob = pulp.LpProblem("Minimize_L1_NonNeg_Integer", pulp.LpMinimize)
-
-    # 2. Define Variables
-    # lowBound=0 allows zero. cat='Integer' enforces 0, 1, 2...
-    x_vars = [pulp.LpVariable(f"x_{i}", lowBound=0, cat="Integer") for i in range(k)]
-
-    # 3. Objective: Minimize sum of x
-    prob += pulp.lpSum(x_vars)
-
-    # 4. Constraints: x.T * A = b  (Equivalent to A.T * x = b.T)
-    # We iterate through columns of A (which map to elements of b)
-    for j in range(d):
-        # Sum(x_i * A[i][j]) == b[j]
-        dot_product = pulp.lpSum([x_vars[i] * A[i][j] for i in range(k)])
-        prob += dot_product == b[j]
-
-    # 5. Solve
-    # PULP_CBC_CMD is the default solver, msg=0 suppresses log output
-    prob.solve(pulp.PULP_CBC_CMD(msg=0))
-
-    # 6. Check Result
-    if pulp.LpStatus[prob.status] == "Optimal":
-        return np.array([int(pulp.value(v)) for v in x_vars])
+    # Ensure inputs are numpy arrays
+    A_arr = np.atleast_2d(A)
+    b_arr = np.atleast_1d(b)
+    
+    d, k = A_arr.shape
+    
+    # 1. Define Objective Function
+    # We want to minimize L1 norm. Since x >= 0, L1 norm is simply sum(x).
+    # This is equivalent to minimizing c @ x where c is a vector of ones.
+    c = np.ones(k)
+    
+    # 2. Define Constraints (Ax = b)
+    # LinearConstraint requires lb <= A @ x <= ub.
+    # For equality Ax = b, we set both lb and ub to b.
+    constraints = LinearConstraint(A_arr, lb=b_arr, ub=b_arr)
+    
+    # 3. Define Integrality
+    # A vector of 1s means every variable x_i must be an integer.
+    integrality = np.ones(k)
+    
+    # 4. Define Bounds
+    # x >= 0 for all x
+    bounds = Bounds(lb=0, ub=np.inf)
+    
+    # 5. Solve using Mixed-Integer Linear Programming
+    res = milp(c=c, constraints=constraints, integrality=integrality, bounds=bounds)
+    
+    # 6. Process Result
+    if res.success:
+        # The solver returns floats; round them to nearest integers
+        return np.round(res.x).astype(int)
     else:
         return None
 
@@ -138,10 +151,10 @@ def solve_l2(input_str):  # input data will be passed to this as string
     def solve(dest_node, ops):
         b = np.array(dest_node)
         k, d = len(ops), len(dest_node)
-        A = np.zeros((k, d), dtype=int)
-        for i in range(k):
-            for ind in ops[i]:
-                A[i][ind] = 1
+        A = np.zeros((d, k), dtype=int)
+        for col_ind, light_inds in enumerate(ops):
+            for row_ind in light_inds:
+                A[row_ind, col_ind] = 1
 
         res = solve_min_l1_integer(A, b)
         if res is None:

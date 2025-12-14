@@ -1,6 +1,6 @@
 # Advent of Code Solutions
 
-Collection of Advent of Code solutions (mostly Python).
+Collection of [Advent of Code](https://adventofcode.com/) solutions (mostly Python).
 
 ## Stats by year
 - [2025](./2025): ✅ (24/24)
